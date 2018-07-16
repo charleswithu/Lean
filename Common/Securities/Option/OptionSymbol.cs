@@ -51,7 +51,12 @@ namespace QuantConnect.Securities.Option
                 daysBefore--;
             }
 
-            while (USHoliday.Dates.Contains(symbol.ID.Date.AddDays(daysBefore)))
+            var holidays = MarketHoursDatabase.FromDataFolder()
+                                              .GetEntry(symbol.ID.Market, symbol, symbol.SecurityType)
+                                              .ExchangeHours
+                                              .Holidays; 
+
+            while (holidays.Contains(symbol.ID.Date.AddDays(daysBefore)))
             {
                 daysBefore--;
             }
