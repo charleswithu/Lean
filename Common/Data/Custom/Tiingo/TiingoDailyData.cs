@@ -164,6 +164,7 @@ namespace QuantConnect.Data.Custom.Tiingo
             {
                 item.Symbol = config.Symbol;
                 item.Time = item.Date;
+                item.Value = item.Close;
             }
 
             return new BaseDataCollection(date, config.Symbol, list);

@@ -38,6 +38,7 @@
   <ItemGroup>
     <Content Include="BasicTemplateOptionsFrameworkAlgorithm.py" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="TiingoDailyDataAlgorithm.py" />
     <None Include="packages.config" />
     <None Include="PearsonCorrelationPairsTradingAlphaModelFrameworkAlgorithm.py" />
   </ItemGroup>
