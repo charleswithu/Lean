@@ -20,7 +20,6 @@ from System import *
 from QuantConnect import *
 from QuantConnect.Algorithm import *
 from QuantConnect.Data.Custom.Tiingo import *
-# from datetime import datetime, timedelta
 
 ### <summary>
 ### This example algorithm shows how to import and use Tiingo daily prices data.
@@ -43,22 +42,25 @@ class TiingoDailyDataAlgorithm(QCAlgorithm):
         self.ticker = "AAPL"
         self.symbol = self.AddData(TiingoDailyData, self.ticker, Resolution.Daily).Symbol
 
-        self.emaFast = self.EMA(self.symbol, 5)
-        self.emaSlow = self.EMA(self.symbol, 10)
+        # Indicators are commented out for now until this issue is resolved:
+        # https://github.com/QuantConnect/Lean/issues/2293
+        # self.emaFast = self.EMA(self.symbol, 5)
+        # self.emaSlow = self.EMA(self.symbol, 10)
 
 
     def OnData(self, slice):
         # OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
 
-        # Extract Tiingo data from the slice
-        tiingoData = slice.Get[TiingoDailyData]()
+        if not slice.ContainsKey(self.ticker): return
 
-        for row in tiingoData.Values:
-            self.Log(f"{self.Time} - {row.Symbol.Value} - {row.Close} {row.Value} {row.Price} - EmaFast:{self.emaFast} - EmaSlow:{self.emaSlow}")
+        # Extract Tiingo data from the slice
+        row = slice[self.ticker]
+
+        self.Log(f"{self.Time} - {row.Symbol.Value} - {row.Close} {row.Value} {row.Price}") # - EmaFast:{self.emaFast} - EmaSlow:{self.emaSlow}")
 
         # Simple EMA cross
-        if not self.Portfolio.Invested and self.emaFast > self.emaSlow:
-            self.SetHoldings(self.symbol, 1)
+        # if not self.Portfolio.Invested and self.emaFast > self.emaSlow:
+        #     self.SetHoldings(self.symbol, 1)
 
-        elif self.Portfolio.Invested and self.emaFast < self.emaSlow:
-            self.Liquidate(_symbol)
+        # elif self.Portfolio.Invested and self.emaFast < self.emaSlow:
+        #     self.Liquidate(_symbol)
