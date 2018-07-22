@@ -51,12 +51,11 @@ namespace QuantConnect.Securities.Option
                 daysBefore--;
             }
 
-            var holidays = MarketHoursDatabase.FromDataFolder()
+            var exchangeHours = MarketHoursDatabase.FromDataFolder()
                                               .GetEntry(symbol.ID.Market, symbol, symbol.SecurityType)
-                                              .ExchangeHours
-                                              .Holidays; 
+                                              .ExchangeHours;
 
-            while (holidays.Contains(symbol.ID.Date.AddDays(daysBefore)))
+            while (!exchangeHours.IsDateOpen(symbol.ID.Date.AddDays(daysBefore)))
             {
                 daysBefore--;
             }
