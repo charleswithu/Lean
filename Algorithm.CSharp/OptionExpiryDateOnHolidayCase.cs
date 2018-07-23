@@ -28,6 +28,7 @@ namespace QuantConnect.Algorithm.CSharp
         public readonly Symbol Underlying = QuantConnect.Symbol.Create(UnderlyingTicker, SecurityType.Equity, Market.USA);
         public readonly Symbol OptionSymbol = QuantConnect.Symbol.Create(UnderlyingTicker, SecurityType.Option, Market.USA);
         private OptionContract _optionContract;
+        private List<Delisting> _delistings = new List<Delisting>();
 
         public override void Initialize()
         {
@@ -52,12 +53,40 @@ namespace QuantConnect.Algorithm.CSharp
                     if (_optionContract != null) MarketOrder(_optionContract.Symbol, 1);
                 }
             }
+
+            Delisting delisting; 
+            if (slice.Delistings.TryGetValue(_optionContract.Symbol, out delisting))
+            {
+                Log(delisting.ToString());
+                _delistings.Add(delisting);
+            }
         }
 
         public override void OnEndOfAlgorithm()
         {
+            if (!(_delistings.Count == 2 && 
+                  _delistings.Any(d => d.Type == DelistingType.Warning) && 
+                  _delistings.Any(d => d.Type == DelistingType.Delisted)))
+            {
+                throw new Exception($"Option contract {_optionContract.Symbol} was not correctly delisted.");
+            }
+
+            if (_delistings.FirstOrDefault(d => d.Type == DelistingType.Warning).EndTime.Date !=
+                new DateTime(2014, 04, 16))
+            {
+                throw new Exception($"Option contract {_optionContract.Symbol} delisting warning was not fired the right date.");
+            }
+
+            if (_delistings.FirstOrDefault(d => d.Type == DelistingType.Delisted).EndTime.Date !=
+                new DateTime(2014, 04, 17))
+            {
+                throw new Exception($"Option contract {_optionContract.Symbol} was not delisted the right date.");
+            }
+
             if (Portfolio[_optionContract.Symbol].Invested)
-                throw new Exception($"Option contract {_optionContract.Symbol} was not delisted");
+            {
+                throw new Exception($"Option contract {_optionContract.Symbol} was not wasn't liquidated as part of delisting.");
+            }
         }
 
         /// <summary>
