@@ -1026,7 +1026,7 @@ namespace QuantConnect.Lean.Engine
                         }
                     }
 
-                    Log.Trace("AlgorithmManager.Run(): Security delisted: " + delisting.Symbol.Value);
+                    Log.Trace("AlgorithmManager.Run(): Security delisted: " + delisting.Symbol.Value + " UtcTime: " + algorithm.UtcTime + " DelistingTime: " + delisting.Time);
                     var cancelledOrders = algorithm.Transactions.CancelOpenOrders(delisting.Symbol);
                     foreach (var cancelledOrder in cancelledOrders)
                     {
