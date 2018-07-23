@@ -43,10 +43,11 @@ namespace QuantConnect.Securities.Option
             // More details: https://www.sec.gov/rules/sro/occ/2013/34-69480.pdf
 
             int daysBefore = 0;
+            var symbolDateTime = symbol.ID.Date;
 
             if (IsStandardContract(symbol) &&
-                symbol.ID.Date.DayOfWeek == DayOfWeek.Saturday &&
-                symbol.ID.Date < new DateTime(2015, 2, 1))
+                symbolDateTime.DayOfWeek == DayOfWeek.Saturday &&
+                symbolDateTime < new DateTime(2015, 2, 1))
             {
                 daysBefore--;
             }
@@ -55,12 +56,12 @@ namespace QuantConnect.Securities.Option
                                               .GetEntry(symbol.ID.Market, symbol, symbol.SecurityType)
                                               .ExchangeHours;
 
-            while (!exchangeHours.IsDateOpen(symbol.ID.Date.AddDays(daysBefore)))
+            while (!exchangeHours.IsDateOpen(symbolDateTime.AddDays(daysBefore)))
             {
                 daysBefore--;
             }
 
-            return symbol.ID.Date.AddDays(daysBefore).Date;
+            return symbolDateTime.AddDays(daysBefore).Date;
         }
     }
 }
